@@ -2,10 +2,17 @@ import pygame
 import random
 import sys
 
+## Essa é a versão sem música e sons para rodar na sala !!!!!!!
+## Se você é o professor e recebeu essa versão em vez da versão normal para avaliação,
+## Por favor peça para o grupo mandar a versão normal !!!!!!!
+
+# Parece que o módulo mixer do Pygame não é suportado nas máquinas da sala
+
+
 ## Inicializa o Pygame
 pygame.init()
 # Inicializa o módulo de sons e música do Pygame
-pygame.mixer.init()
+# pygame.mixer.init()
 
 # Janela do jogo
 SCREEN_WIDTH = 600
@@ -279,13 +286,13 @@ pausebg = pygame.image.load('./resources/pausebg.png').convert_alpha()
 layers = pygame.sprite.LayeredUpdates()
 
 # Carregar sons
-hit_sound = pygame.mixer.Sound("./resources/hit.mp3")
-pup_sound = pygame.mixer.Sound("./resources/powerup.mp3")
-gameover_sound = pygame.mixer.Sound("./resources/gameover.mp3")
-diffchange_sound = pygame.mixer.Sound("./resources/diffchange.mp3")
-unlock_sound = pygame.mixer.Sound("./resources/unlock.mp3")
-fail_sound = pygame.mixer.Sound("./resources/fail.mp3")
-select_sound = pygame.mixer.Sound("./resources/select.mp3")
+# hit_sound = pygame.mixer.Sound("./resources/hit.mp3")
+# pup_sound = pygame.mixer.Sound("./resources/powerup.mp3")
+# gameover_sound = pygame.mixer.Sound("./resources/gameover.mp3")
+# diffchange_sound = pygame.mixer.Sound("./resources/diffchange.mp3")
+# unlock_sound = pygame.mixer.Sound("./resources/unlock.mp3")
+# fail_sound = pygame.mixer.Sound("./resources/fail.mp3")
+# select_sound = pygame.mixer.Sound("./resources/select.mp3")
 
 ## Sprite do jogador
 # O parâmetro layer determina em qual camada será desenhado
@@ -319,25 +326,20 @@ class Player( pygame.sprite.Sprite ):
         # Movimentação do jogador baseado em botões apertados
         # Roda apenas se o jogo não terminou 
         if not ended:  
-            if ( keys[pygame.K_LEFT] ):
+            if ( keys[pygame.K_LEFT] and x > 25 ):
                 left = True
                 x -= PLAYER_SPEED
-            elif ( keys[pygame.K_RIGHT] ):
+            elif ( keys[pygame.K_RIGHT] and x < SCREEN_WIDTH - 25 ):
                 right = True
                 x += PLAYER_SPEED
-            elif ( keys[pygame.K_UP] ):
+            elif ( keys[pygame.K_UP] and y > 25 ):
                 y -= PLAYER_SPEED
-            elif ( keys[pygame.K_DOWN] ):
+            elif ( keys[pygame.K_DOWN] and y < SCREEN_HEIGHT - 25):
                 y += PLAYER_SPEED
             else:
                 left = False
                 right = False
 
-        # Impedir o jogador de sair da tela
-        if x < 0:
-            x = 0
-        if x > SCREEN_WIDTH-30:
-            x = SCREEN_WIDTH-30
         self.rect.center = ( x, y )
 
         # Mudar imagem de acordo com o estado do jogador (e de acordo com modelo escolhido)
@@ -476,12 +478,12 @@ class Obstacle( pygame.sprite.Sprite ):
             score += 1
             # Se quando aumentamos a pontuação passamos para outra dificuldade,
             # Toca o som que indica mudança de dificuldade
-            if score == 50:
-                diffchange_sound.play()
-            elif score == 100:
-                diffchange_sound.play()
-            elif score == 200:
-                diffchange_sound.play()
+            # if score == 50:
+                # diffchange_sound.play()
+            # elif score == 100:
+                # diffchange_sound.play()
+            # elif score == 200:
+                # diffchange_sound.play()
         # Atualizar o retângulo com as posições que foram modificadas
         self.rect.center = ( x, y )
 
@@ -652,9 +654,9 @@ def game_loop():
     layers.add(avalanche)
 
     # Tocar música de jogo
-    if music:
-        pygame.mixer.music.load("./resources/gamesong.mp3")
-        pygame.mixer.music.play(-1)
+    # if music:
+        # pygame.mixer.music.load("./resources/gamesong.mp3")
+        # pygame.mixer.music.play(-1)
 
     # Loop do jogo
     while running:
@@ -665,10 +667,7 @@ def game_loop():
             resume_button = Button(SCREEN_WIDTH // 2 + 10, 50, True, "Resumir")
 
             # Processar input
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+            for event in pygame.event.get():              
                 if event.type == pygame.KEYDOWN:
                     # Pausar o jogo
                     if event.key == pygame.K_ESCAPE and pause and not pvar:
@@ -720,8 +719,9 @@ def game_loop():
         # Processar jeitos de fechar o jogo
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
                 sys.exit()
+                running = False
             if event.type == pygame.KEYDOWN:
                 # Pausar o jogo com ESC
                 if event.key == pygame.K_ESCAPE and not pause:
@@ -773,7 +773,7 @@ def game_loop():
                     for a in avalanche:
                         if pygame.sprite.collide_rect(obstaculo,p) and not hit:
                             # Tocar som
-                            hit_sound.play()
+                            # hit_sound.play()
                             # Jogador fica temporariamente invulnerável logo após a colisão
                             obstaculo.collide()
                             hit = True
@@ -795,7 +795,7 @@ def game_loop():
                     # Se o powerup for de tipo 1, aumentar velocidade do jogador
                     if pygame.sprite.collide_rect(powerup,p) and powerup.type == 1:
                         # Tocar som
-                        pup_sound.play()
+                        # pup_sound.play()
                         powerup.collide()
                         PLAYER_SPEED += 2
                         # Variável para mudar a imagem do jogador
@@ -805,7 +805,7 @@ def game_loop():
                     # Se o powerup for de tipo 2, abaixar a avalanche
                     if pygame.sprite.collide_rect(powerup,p) and powerup.type == 2:
                         # Tocar som
-                        pup_sound.play()
+                        # pup_sound.play()
                         powerup.collide()
                         x, y = a.rect.center
                         if avalanche_target < 1170:
@@ -877,15 +877,16 @@ def game_loop():
         # Frames por segundo do jogo
         clock.tick(60)
 
+    pygame.quit()
 # Função do menu principal
 def main_menu():
     # Avisar o código que não estamos referenciando variáveis locais
     global nivel, nivel_choice, hscore, music
 
     # Tocar música de menu
-    if music:
-        pygame.mixer.music.load("./resources/menusong.mp3")
-        pygame.mixer.music.play(-1)
+    # if music:
+        # pygame.mixer.music.load("./resources/menusong.mp3")
+        # pygame.mixer.music.play(-1)
 
     # Ler highscore do arquivo local
     file = open("./resources/highscore.txt", "r")
@@ -990,11 +991,11 @@ def options_menu():
                 if mute_button.rect.collidepoint(event.pos):
                     if mute_button.active:
                         music = False
-                        pygame.mixer.music.stop()
+                        # pygame.mixer.music.stop()
                         mute_button = Button(SCREEN_WIDTH - 70, SCREEN_HEIGHT - 100, False, type=2)
                     else:
                         music = True
-                        pygame.mixer.music.play()
+                        # pygame.mixer.music.play()
                         mute_button = Button(SCREEN_WIDTH - 70, SCREEN_HEIGHT - 100, True, type=2)
                         
         # Desenhar tela, texto e botões
@@ -1046,7 +1047,7 @@ def unlocks_menu():
                 if player2unlock.rect.collidepoint(event.pos):
                     if hscore >= 50 and not player2unlocked:
                         player2unlock = Button(SCREEN_WIDTH // 2 + 50, 200, False, type=3)
-                        unlock_sound.play()
+                        # unlock_sound.play()
                         player2unlocked = True
                         resett = now + 1000
                     elif player2unlocked and chosen != 2:
@@ -1054,37 +1055,37 @@ def unlocks_menu():
                         player2unlock = Button(SCREEN_WIDTH // 2 + 50, 200, False, type=3)
                         player4unlock = Button(SCREEN_WIDTH // 2 + 50, 600, True, type=5)
                         player3unlock = Button(SCREEN_WIDTH // 2 + 50, 400, True, type=4)
-                        select_sound.play()
-                    else:
-                        fail_sound.play()
+                        # select_sound.play()
+                    # else:
+                        # fail_sound.play()
                 if player3unlock.rect.collidepoint(event.pos):
                     if hscore >= 100 and not player3unlocked:
                         player3unlocked = True
                         player3unlock = Button(SCREEN_WIDTH // 2 + 50, 400, False, type=4)
-                        unlock_sound.play()
+                        # unlock_sound.play()
                         resett = now + 1000
                     elif player3unlocked and chosen != 3:
                         chosen = 3
                         player3unlock = Button(SCREEN_WIDTH // 2 + 50, 400, False, type=4)
                         player2unlock = Button(SCREEN_WIDTH // 2 + 50, 200, True, type=3)
                         player4unlock = Button(SCREEN_WIDTH // 2 + 50, 600, True, type=5)
-                        select_sound.play()
-                    else:
-                        fail_sound.play()
+                        # select_sound.play()
+                    # else:
+                        # fail_sound.play()
                 if player4unlock.rect.collidepoint(event.pos):
                     if hscore >= 200 and not player4unlocked:
                         player4unlocked = True
                         player4unlock = Button(SCREEN_WIDTH // 2 + 50, 600, False, type=5)
-                        unlock_sound.play()
+                        # unlock_sound.play()
                         resett = now + 1000
                     elif player4unlocked and chosen != 4:
                         chosen = 4
                         player4unlock = Button(SCREEN_WIDTH // 2 + 50, 600, False, type=5)
                         player3unlock = Button(SCREEN_WIDTH // 2 + 50, 400, True, type=4)
                         player2unlock = Button(SCREEN_WIDTH // 2 + 50, 200, True, type=3)
-                        select_sound.play()
-                    else:
-                        fail_sound.play()
+                        # select_sound.play()
+                    # else:
+                        # fail_sound.play()
                 if return_button.rect.collidepoint(event.pos):
                     unlock = False
         if now >= resett:
@@ -1135,9 +1136,9 @@ def death_screen():
     global score
 
     # Parar música e sons e tocar som de gameover
-    pygame.mixer.music.stop()
-    pygame.mixer.stop()
-    gameover_sound.play()
+    # pygame.mixer.music.stop()
+    # pygame.mixer.stop()
+    # gameover_sound.play()
 
     # Variável de loop para o menu
     dscreen = True
