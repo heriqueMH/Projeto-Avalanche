@@ -319,25 +319,20 @@ class Player( pygame.sprite.Sprite ):
         # Movimentação do jogador baseado em botões apertados
         # Roda apenas se o jogo não terminou 
         if not ended:  
-            if ( keys[pygame.K_LEFT] ):
+            if ( keys[pygame.K_LEFT] and x > 25 ):
                 left = True
                 x -= PLAYER_SPEED
-            elif ( keys[pygame.K_RIGHT] ):
+            elif ( keys[pygame.K_RIGHT] and x < SCREEN_WIDTH - 25 ):
                 right = True
                 x += PLAYER_SPEED
-            elif ( keys[pygame.K_UP] ):
+            elif ( keys[pygame.K_UP] and y > 25 ):
                 y -= PLAYER_SPEED
-            elif ( keys[pygame.K_DOWN] ):
+            elif ( keys[pygame.K_DOWN] and y < SCREEN_HEIGHT - 25):
                 y += PLAYER_SPEED
             else:
                 left = False
                 right = False
 
-        # Impedir o jogador de sair da tela
-        if x < 0:
-            x = 0
-        if x > SCREEN_WIDTH-30:
-            x = SCREEN_WIDTH-30
         self.rect.center = ( x, y )
 
         # Mudar imagem de acordo com o estado do jogador (e de acordo com modelo escolhido)
@@ -666,9 +661,6 @@ def game_loop():
 
             # Processar input
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
                 if event.type == pygame.KEYDOWN:
                     # Pausar o jogo
                     if event.key == pygame.K_ESCAPE and pause and not pvar:
@@ -720,8 +712,9 @@ def game_loop():
         # Processar jeitos de fechar o jogo
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
                 sys.exit()
+                running = False
             if event.type == pygame.KEYDOWN:
                 # Pausar o jogo com ESC
                 if event.key == pygame.K_ESCAPE and not pause:
